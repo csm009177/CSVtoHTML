@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPU Search</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV 데이터 표시</title>
 </head>
 <body>
-    <h1>CPU 검색</h1>
-    <label for="cpu-search">CPU 이름:</label>
-    <input type="text" id="cpu-search">
-    <button onclick="searchCPU()">검색</button>
-    <div id="results"></div>
+  <h1>CSV 데이터</h1>
+  <ul id="data-list"></ul>
 
-    <script src="index.js"></script>
+  <script>
+    // 서버로부터 받아온 CSV 데이터를 처리하는 스크립트
+    async function fetchData() {
+      const response = await fetch('/data');
+      const data = await response.json();
+      const dataList = document.getElementById('data-list');
+
+      data.forEach(item => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${item.name}: ${item.value}`;
+        dataList.appendChild(listItem);
+      });
+    }
+
+    fetchData();
+  </script>
 </body>
 </html>
