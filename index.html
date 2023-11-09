@@ -12,15 +12,20 @@
   <script>
     // 서버로부터 받아온 CSV 데이터를 처리하는 스크립트
     async function fetchData() {
-      const response = await fetch('/data');
-      const data = await response.json();
-      const dataList = document.getElementById('data-list');
-
-      data.forEach(item => {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${item.name}: ${item.value}`;
-        dataList.appendChild(listItem);
-      });
+      try {
+        const response = await fetch('/data.csv');
+        const csvData = await response.text();
+        const dataList = document.getElementById('data-list');
+        
+        // CSV 데이터를 각 줄을 리스트 아이템으로 추가
+        csvData.split('\n').forEach(line => {
+          const listItem = document.createElement('li');
+          listItem.textContent = line;
+          dataList.appendChild(listItem);
+        });
+      } catch (error) {
+        console.error('데이터를 불러오는 중 오류 발생:', error);
+      }
     }
 
     fetchData();
