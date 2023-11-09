@@ -27,16 +27,18 @@ const server = http.createServer((req, res) => {
         res.end('Internal Server Error');
         return;
       }
-      // send CSV data as text
-      res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end(csvData);
+      // split CSV data into lines and send as JSON array
+      const lines = csvData.split('\n');
+      const data = lines.map(line => line.split(','));
+      
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(data));
     });
   } else {
     res.writeHead(404, { 'Content-Type': 'text/plain' });
     res.end('Not Found');
   }
 });
-
 // listen
 server.listen(port, () => {
   console.log(`http://localhost:${port}`);

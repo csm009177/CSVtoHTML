@@ -7,6 +7,14 @@
 </head>
 <body>
   <h1>CSV 데이터</h1>
+
+  <!-- 검색을 위한 input과 button -->
+  <form id="search-form">
+    <label for="search-input">검색:</label>
+    <input type="text" id="search-input" name="search-input">
+    <button type="button" onclick="searchData()">검색</button>
+  </form>
+
   <ul id="data-list"></ul>
 
   <script>
@@ -14,18 +22,31 @@
     async function fetchData() {
       try {
         const response = await fetch('/data.csv');
-        const csvData = await response.text();
+        const data = await response.json();
         const dataList = document.getElementById('data-list');
-        
-        // CSV 데이터를 각 줄을 리스트 아이템으로 추가
-        csvData.split('\n').forEach(line => {
+
+        // 각 라인을 리스트 아이템으로 추가
+        data.forEach(fields => {
           const listItem = document.createElement('li');
-          listItem.textContent = line;
+          listItem.textContent = fields.join(' | '); // 필드를 콤마로 구분하여 문자열로 합침
           dataList.appendChild(listItem);
         });
       } catch (error) {
         console.error('데이터를 불러오는 중 오류 발생:', error);
       }
+    }
+
+    // 검색 기능 추가
+    function searchData() {
+      const searchInput = document.getElementById('search-input').value.toLowerCase();
+      const dataList = document.getElementById('data-list');
+      const listItems = dataList.getElementsByTagName('li');
+
+      // 각 리스트 아이템을 검색어와 비교하여 표시 여부 결정
+      Array.from(listItems).forEach(item => {
+        const textContent = item.textContent.toLowerCase();
+        item.style.display = textContent.includes(searchInput) ? 'block' : 'none';
+      });
     }
 
     fetchData();
