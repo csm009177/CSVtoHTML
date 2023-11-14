@@ -1,45 +1,37 @@
-// http
-const http = require('http');
+const express = require('express');
 const fs = require('fs');
 const parse = require('csv-parse');
 
-// port
+const app = express();
 const port = 3000;
 
-// server
-const server = http.createServer((req, res) => {
-  if (req.method === 'GET' && req.url === '/') {
-    // read index.html file and response
-    fs.readFile('index.html', 'utf8', (err, data) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-        return;
-      }
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end(data);
-    });
-  } else if (req.method === 'GET' && req.url === '/data.csv') {
-    // read CSV file and send to client as text
-    fs.readFile('data.csv', 'utf8', (err, csvData) => {
-      if (err) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Internal Server Error');
-        return;
-      }
-      // split CSV data into lines and send as JSON array
-      const lines = csvData.split('\n');
-      const data = lines.map(line => line.split(','));
-      
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(data));
-    });
-  } else {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('Not Found');
-  }
+app.get('/', (req, res) => {
+  fs.readFile('index.html', 'utf8', (err, data) => {
+    if (err) {
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    res.status(200).type('text/html').send(data);
+  });
 });
-// listen
-server.listen(port, () => {
-  console.log(`http://localhost:${port}`);
+
+app.get('/data.csv', (req, res) => {
+  fs.readFile('data.csv', 'utf8', (err, csvData) => {
+    if (err) {
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    const lines = csvData.split('\n');
+    const data = lines.map(line => line.split(','));
+
+    res.status(200).json(data);
+  });
+});
+
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
+
+app.listen(port, () => {
+  console.log(`Server is listening on http://localhost:${port}`);
 });
